@@ -22,7 +22,7 @@ void* fifo_read(fifo *queue){
 }
 
 //write to fifo queue
-void* fifo_write(fifo *queue, void* handle){
+int fifo_write(fifo *queue, void* handle){
     if(((queue->head + 1) % queue->size) ==  queue->tail){
         return -1;
     }
@@ -63,13 +63,14 @@ int is_empty(stack *st){
 }
 
 //pushes data on top of a stack
-void push(stack *st, void* data){
+int push(stack *st, void* data){
     if(is_full(st)){
         return -1;
     }else
     {
         st->top++;
-        st->data[st->top] = data; 
+        st->data[st->top] = data;
+        return 0;
     }
 }
 
@@ -90,4 +91,41 @@ void* pop(stack *st){
 stack make_stack(int size){
     stack st = {0, size, malloc(sizeof(void*) * size)};
     return st;
+}
+
+int main(){
+    stack st = make_stack(101);
+    fifo queue = make_fifo(101);
+
+    printf("Adding to FIFO queue:\n");
+    for (size_t i = 0; i < 100; i++)
+    {
+        printf("%d", (void*) i);
+        printf("\n");
+        fifo_write(&queue , i);
+    }
+
+    printf("Reading the FIFO queue:\n");
+    for (int i = 0; i < 100; i++)
+    {
+        printf("%d", fifo_read(&queue));
+        printf("\n");
+    }
+
+    printf("Adding to FILO queue:\n");
+    for (size_t i = 0; i < 100; i++)
+    {
+        printf("%d", (void*) i);
+        printf("\n");
+        push(&st , i);
+    }
+
+    printf("Reading the FILO queue:\n");
+    for (int i = 0; i < 100; i++)
+    {
+        printf("%d", pop(&st));
+        printf("\n");
+    }
+    
+    return 0;
 }
