@@ -1,28 +1,28 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-typedef struct
+typedef struct node
 {
-    node* prev_node;
+    struct node* prev_node;
     int value;
-    node* next_node;
-}node;
+    struct node* next_node;
+}node_t;
 
-void append(node* head, int value){
-    node* tmp_node = head;
+void append(node_t* head, int value){
+    node_t* tmp_node = head;
     while (tmp_node->next_node != head)
     {
        tmp_node = tmp_node->next_node;
     }
-    node* new_node = (node*) malloc(sizeof(node));
+    node_t* new_node = (node_t*) malloc(sizeof(node_t));
     tmp_node->next_node = new_node;
     new_node->prev_node = tmp_node;
     new_node->next_node = head;
     new_node->value = value;  
 }
 
-void print_list(node* head){
-    node* tmp_node = head;
+void print_list(node_t* head){
+    node_t* tmp_node = head;
     while (tmp_node->next_node != head)
     {
         printf("%d", tmp_node->value);
@@ -30,8 +30,8 @@ void print_list(node* head){
     }
 }
 
-int getById(node* head, int id){
-    node* tmp_node = head;
+int getById(node_t* head, int id){
+    node_t* tmp_node = head;
     for (size_t i = 0; i < id; i++)
     {
         tmp_node = tmp_node->next_node;
@@ -39,8 +39,8 @@ int getById(node* head, int id){
     return tmp_node->value;
 }
 
-void merge(node* head1,node* head2){
-    node* tmp_node = head1;
+void merge(node_t* head1,node_t* head2){
+    node_t* tmp_node = head1;
     while (tmp_node->next_node != head1)
     {
         tmp_node = tmp_node->next_node;
@@ -54,4 +54,8 @@ void merge(node* head1,node* head2){
     }
     tmp_node->next_node = head1;
     head1->prev_node = tmp_node;
+}
+
+int main(){
+    return 0;
 }

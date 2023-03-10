@@ -1,34 +1,35 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<time.h>
 
-typedef struct
+typedef struct node
 {
     int value;
-    node* next_node;
-}node;
+    struct node* next_node;
+}node_t;
 
-void print_list(node* head){
-    node* tmp_node =  head;
-    while (tmp_node->next_node != NULL)
+void print_list(node_t* head){
+    node_t* tmp_node =  head;
+    while (tmp_node != NULL)
     {
-        printf("%d", tmp_node->value);
+        printf("%d\n", tmp_node->value);
         tmp_node = tmp_node->next_node;
     }
 }
 
-void append(node* head, int value){
-    node* tmp_node =  head;
+void append(node_t* head, int value){
+    node_t* tmp_node =  head;
     while (tmp_node->next_node != NULL)
     {
         tmp_node = tmp_node->next_node;
     }
-    tmp_node->next_node = (node*) malloc(sizeof(node));
+    tmp_node->next_node = (node_t*) malloc(sizeof(node_t));
     tmp_node->next_node->value = value;
     tmp_node->next_node->next_node = NULL;
 }
 
-void merge(node* head1, node* head2){
-    node* tmp_node =  head1;
+void merge(node_t* head1, node_t* head2){
+    node_t* tmp_node =  head1;
     while (tmp_node->next_node != NULL)
     {
         tmp_node = tmp_node->next_node;
@@ -36,9 +37,9 @@ void merge(node* head1, node* head2){
     tmp_node->next_node = head2;
 }
 
-int getById(node* head, int id){
+int getById(node_t* head, int id){
     int count = 0;
-    node* tmp_node =  head;
+    node_t* tmp_node =  head;
     while (count != id || tmp_node != NULL)
     {
         tmp_node = tmp_node->next_node;
@@ -46,14 +47,41 @@ int getById(node* head, int id){
     }
     if (tmp_node == NULL){
         printf("something went wrong");
-        return NULL;
+        return 0;
     }else
     {
         return tmp_node->value;
     }
-    
 }
 
 int main(){
+    srand(time(NULL));
+
+    node_t* head = NULL;
+    head = (node_t*) malloc(sizeof(node_t));
+    if(head == NULL){
+        return 1;
+    }
+    head->value = rand();
+    head->next_node = NULL;
+
+    for (size_t i = 0; i < 10000; i++)
+    {
+        append(head, rand());
+    }
+
+    print_list(head);
+
+    double time[2000];
+    clock_t t;
+    for (size_t i = 0; i < 2000; i++)
+    {
+        t = clock();
+        getById(head, 5);
+        t = clock()-t;
+        time[i] = ((double)t) / CLOCKS_PER_SEC;
+        printf("%f\n", time[i]);
+    }
+
     return 0;
 }
