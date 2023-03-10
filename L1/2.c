@@ -70,17 +70,19 @@ int main(){
         append(head, rand());
     }
 
-    print_list(head);
-
     double time[2000];
     clock_t t;
     for (size_t i = 0; i < 2000; i++)
     {
         t = clock();
         getById(head, 5);
-        t = clock()-t;
+        t = clock() - t;
         time[i] = ((double)t) / CLOCKS_PER_SEC;
-        printf("%f\n", time[i]);
+    }
+
+    for (size_t i = 0; i < 2000; i++)
+    {
+        printf("%lf\n", time[i]);
     }
 
     return 0;
