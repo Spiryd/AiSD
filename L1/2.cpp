@@ -72,12 +72,13 @@ public:
 
 int main(){
     srand(time(0));
+    cout << "Tworze liste randomowych int:" << endl;
     List list;
     for (size_t i = 0; i < 10000; i++)
     {
         list.append(rand());
     }
-    //list1.print();
+    list.print();
     int sum = 0;
     for (size_t i = 0; i < 1000; i++)
     {
@@ -111,19 +112,21 @@ int main(){
         sum += duration.count();
     }
     cout << "Avg. time accesing the random element: " << sum/1000 << " microseconds" << endl;
-
+    cout << "Tworze liste 1:" << endl;
     List list1;
-    List list2;
     list1.append(1);
     list1.append(2);
     list1.append(3);
     list1.append(4);
+    list1.print();
+    cout << "Tworze liste 2:" << endl;
+    List list2;
     list2.append(1);
     list2.append(2);
     list2.append(3);
     list2.append(4);
-    list1.print();
     list2.print();
+    cout << "Łącze listy" << endl;
     list1.merge(&list2);
     list1.print();
     return 0;
