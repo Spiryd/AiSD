@@ -3,6 +3,8 @@ use std::collections::VecDeque;
 use rand::prelude::*;
 use rand_pcg::Pcg64;
 
+mod sort;
+
 #[derive(Debug)]
 enum Order{
     Random,
@@ -30,7 +32,7 @@ fn gen_list(n: u64, order: Order) -> Vec<u64>{
     }
 }
 
-fn insertion_sort(table: &mut Vec<u64>){
+ pub fn insertion_sort(table: &mut Vec<u64>){
     for i in 1..table.len() {
         let mut j = i;
         while j > 0 && table[j] < table[j - 1] {
@@ -40,7 +42,12 @@ fn insertion_sort(table: &mut Vec<u64>){
     }
 }
 
-fn merge_sort(table: &mut Vec<u64>) -> Vec<u64>{
+pub fn merge_sort(table: &mut Vec<u64>){
+    let mut to_be_sorted = table.clone();
+    table.swap_with_slice(&mut _merge_sort(&mut to_be_sorted)[..]);
+}
+
+fn _merge_sort(table: &mut Vec<u64>) -> Vec<u64>{
     if table.len() > 1 {
         let mut left: Vec<u64> = Vec::new();
         let mut right: Vec<u64> = Vec::new();
@@ -51,8 +58,8 @@ fn merge_sort(table: &mut Vec<u64>) -> Vec<u64>{
                 right.push(key.clone());
             }
         }
-        left = merge_sort(&mut left);
-        right = merge_sort(&mut right);
+        left = _merge_sort(&mut left);
+        right = _merge_sort(&mut right);
         return merge(left, right);
     } else {
         return table.clone();
@@ -82,15 +89,36 @@ fn merge(left: Vec<u64>, right: Vec<u64>) -> Vec<u64>{
 
 pub fn quick_sort(table: &mut Vec<u64>){
     let len = table.len();
-    _quick_sort(table, 0, (len - 1));
+    _quick_sort(table, 1, len - 1);
 }
 
 fn _quick_sort(table: &mut Vec<u64>, low: usize, high: usize){
-    todo!()
+    if low < high {
+        let p = partition(table, low, high);
+        _quick_sort(table, low, p - 1);
+        _quick_sort(table, p + 1, high);
+    }
 }
 
-fn partition(table: &mut Vec<u64>, low: usize, high: usize){
-    todo!()
+fn partition(table: &mut Vec<u64>, low: usize, high: usize) -> usize{
+    let pivot = match table.get(high) {
+        Some(v) => {v.clone()}
+        _ => {panic!("Array index {:?} out of bounds", high)}
+    };
+    let mut i = low;
+    for j in low..high-1 {
+        match table.to_vec().get(j) {
+            Some(v) => {
+                if v <= &pivot {
+                    &table.swap(i, j);
+                    i += 1;
+                }
+            }
+            _ => {panic!("Array index {:?} for j out of bounds", j)}
+        }
+    }
+    &table.swap(i, high);
+    i
 }
 
 fn main() {
@@ -100,6 +128,10 @@ fn main() {
     println!("{:?}", list);
     list = gen_list(25, Order::Random);
     println!("{:?}", list);
-    list = merge_sort(&mut list);
+    merge_sort(&mut list);
+    println!("{:?}", list);
+    list = gen_list(25, Order::Random);
+    println!("{:?}", list);
+    quick_sort(&mut list);
     println!("{:?}", list);
 }
