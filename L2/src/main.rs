@@ -1,5 +1,3 @@
-use std::collections::VecDeque;
-
 use rand::prelude::*;
 use rand_pcg::Pcg64;
 

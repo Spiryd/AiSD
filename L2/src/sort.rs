@@ -58,7 +58,7 @@ fn merge(left: Vec<u64>, right: Vec<u64>) -> Vec<u64>{
 
 pub fn quick_sort(table: &mut Vec<u64>){
     let len = table.len();
-    _quick_sort(table, 1, len - 1);
+    _quick_sort(table, 0, len - 1);
 }
 
 fn _quick_sort(table: &mut Vec<u64>, low: usize, high: usize){
@@ -75,7 +75,7 @@ fn partition(table: &mut Vec<u64>, low: usize, high: usize) -> usize{
         _ => {panic!("Array index {:?} out of bounds", high)}
     };
     let mut i = low;
-    for j in low..high-1 {
+    for j in low..high {
         match table.to_vec().get(j) {
             Some(v) => {
                 if v <= &pivot {
