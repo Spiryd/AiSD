@@ -30,6 +30,10 @@ fn gen_list(n: u64, order: Order) -> Vec<u64>{
     }
 }
 
+fn special_print(list: Vec<u64>){
+    todo!()
+}
+
 fn main() {
     let mut list = gen_list(25, Order::Random);
     println!("{:?}", list);
