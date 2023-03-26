@@ -1,4 +1,33 @@
 use std::collections::VecDeque;
+use rand::prelude::*;
+use rand_pcg::Pcg64;
+
+#[derive(Debug)]
+pub enum Order{
+    Random,
+    Sorted,
+    Reverse
+}
+
+pub fn gen_list(n: u64, order: Order) -> Vec<u64>{
+    let mut rng:Pcg64 = Pcg64::from_entropy();
+    let mut vector: Vec<u64> = Vec::new();
+    for _ in 0..n {
+        vector.push(rng.gen_range(0..2*n));
+    }
+    match order {
+        Order::Random => return vector,
+        Order::Sorted => {
+            vector.sort();
+            return vector;
+        },
+        Order::Reverse => {
+            vector.sort();
+            vector.reverse();
+            return vector;
+        },
+    }
+}
 
 
 pub fn insertion_sort(table: &mut Vec<u64>){
