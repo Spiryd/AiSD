@@ -6,5 +6,8 @@ fn main() {
     if args.len() != 2 {
         panic!("Expected n - length of list")
     }
-    dbg!(&args[1]);
+    let length = args[1].parse::<u64>().unwrap();
+    let list = gen_list(length, Order::Random);
+    print!("{length}");
+    print_to_std(list);
 }

@@ -29,6 +29,12 @@ pub fn gen_list(n: u64, order: Order) -> Vec<u64>{
     }
 }
 
+pub fn print_to_std(list: Vec<u64>){
+    for key in list {
+        print!(" {key}")
+    }
+}
+
 
 pub fn insertion_sort(table: &mut Vec<u64>){
     for i in 1..table.len() {
