@@ -86,35 +86,39 @@ fn merge(left: Vec<u64>, right: Vec<u64>) -> Vec<u64>{
 }
 
 pub fn quick_sort(table: &mut Vec<u64>){
-    let len = table.len();
-    _quick_sort(table, 0, len - 1);
+    if !table.is_empty(){
+        _quick_sort(table, 0, table.len() - 1);
+    }
 }
 
 fn _quick_sort(table: &mut Vec<u64>, low: usize, high: usize){
     if low < high {
         let p = partition(table, low, high);
-        _quick_sort(table, low, p - 1);
+        _quick_sort(table, low, p);
         _quick_sort(table, p + 1, high);
     }
 }
 
 fn partition(table: &mut Vec<u64>, low: usize, high: usize) -> usize{
-    let pivot = match table.get(high) {
-        Some(v) => {v.clone()}
-        _ => {panic!("Array index {:?} out of bounds", high)}
-    };
-    let mut i = low;
-    for j in low..high {
-        match table.to_vec().get(j) {
-            Some(v) => {
-                if v <= &pivot {
-                    let _ = &table.swap(i, j);
-                    i += 1;
-                }
+    let pivot = table[(((((high - low)/2) as f64).floor()) as usize) + low];
+    let mut left_index = (low  as isize) - 1;
+    let mut right_index = (high + 1) as isize;
+    loop {
+        loop {
+            left_index += 1;
+            if table[left_index as usize] >= pivot{
+                break;
             }
-            _ => {panic!("Array index {:?} for j out of bounds", j)}
         }
+        loop {
+            right_index -= 1;
+            if table[right_index as usize] <= pivot{
+                break;
+            }
+        }
+        if left_index >= right_index{
+            return right_index as usize;
+        }
+        table.swap(left_index as usize, right_index as usize);
     }
-    let _ = &table.swap(i, high);
-    i
 }
