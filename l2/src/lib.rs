@@ -46,6 +46,34 @@ pub fn insertion_sort(table: &mut Vec<u64>){
     }
 }
 
+pub fn insertion_sort_with_stats(table: &mut Vec<u64>, full_stats: bool) -> (u32, u32){
+    let mut swap_count: u32 = 0; 
+    let mut check_count: u32 = 0;
+    if full_stats {
+        for i in 1..table.len() {
+            let mut j = i;
+            check_count+=1;
+            while j > 0 && table[j] < table[j - 1] {
+                check_count+=1;
+                table.swap(j, j - 1);
+                swap_count+=1;
+                j -= 1;
+                println!("{:?}", table);
+            }
+        }
+    }else {
+        for i in 1..table.len() {
+            let mut j = i;
+            while j > 0 && table[j] < table[j - 1] {
+                table.swap(j, j - 1);
+                j -= 1;
+            }
+        }
+    }
+    return (swap_count, check_count);
+
+}
+
 pub fn merge_sort(table: &mut Vec<u64>){
     let mut to_be_sorted = table.clone();
     table.swap_with_slice(&mut _merge_sort(&mut to_be_sorted)[..]);
@@ -126,5 +154,45 @@ fn partition(table: &mut Vec<u64>, low: usize, high: usize) -> usize{
             return right_index as usize;
         }
         table.swap(left_index as usize, right_index as usize);
+    }
+}
+
+pub fn quick_sort_with_stats(table: &mut Vec<u64>, full_stats: bool) -> (u32, u32){
+    let mut stats: (u32, u32) = (0, 0);
+    if !table.is_empty(){
+        _quick_sort(table, 0, table.len() - 1);
+    }
+    return (stats.0, stats.1);
+}
+
+fn partition_with_stats(table: &mut Vec<u64>, low: usize, high: usize) -> usize{
+    let pivot = table[(((((high - low)/2) as f64).floor()) as usize) + low];
+    let mut left_index = (low  as isize) - 1;
+    let mut right_index = (high + 1) as isize;
+    loop {
+        loop {
+            left_index += 1;
+            if table[left_index as usize] >= pivot{
+                break;
+            }
+        }
+        loop {
+            right_index -= 1;
+            if table[right_index as usize] <= pivot{
+                break;
+            }
+        }
+        if left_index >= right_index{
+            return right_index as usize;
+        }
+        table.swap(left_index as usize, right_index as usize);
+    }
+}
+
+fn _quick_sort_with_stats(table: &mut Vec<u64>, low: usize, high: usize){
+    if low < high {
+        let p = partition(table, low, high);
+        _quick_sort(table, low, p);
+        _quick_sort(table, p + 1, high);
     }
 }

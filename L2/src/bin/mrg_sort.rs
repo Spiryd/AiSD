@@ -15,13 +15,6 @@ fn main(){
     }
     list = Vec::from(&list[1..]); 
     println!("{:?}", list);
-    let stats: (u32, u32);
-    if list.len() < 40 {
-        stats = insertion_sort_with_stats(&mut list, true);
-    }else {
-        stats = insertion_sort_with_stats(&mut list, false);
-    }
+    merge_sort(&mut list);
     println!("{:?}", list);
-    println!("swaps = {}", stats.0);
-    println!("checks = {}", stats.1);
 }
