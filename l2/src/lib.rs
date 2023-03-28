@@ -84,8 +84,11 @@ pub fn insertion_sort_with_stats(table: &mut Vec<u64>, print_proc: bool) -> (u32
     }else {
         for i in 1..table.len() {
             let mut j = i;
+            check_count+=1;
             while j > 0 && table[j] < table[j - 1] {
+                check_count+=1;
                 table.swap(j, j - 1);
+                swap_count+=1;
                 j -= 1;
             }
         }
@@ -258,15 +261,19 @@ fn merge_with_stats(left: Vec<u64>, right: Vec<u64>, stats: &mut (u32, u32), pri
         stats.1 += 1;
         if left.front().unwrap() <= right.front().unwrap() {
             merged.push_back(left.pop_front().unwrap());
+            stats.0 += 1;
         } else {
             merged.push_back(right.pop_front().unwrap());
+            stats.0 += 1;
         }
     }
     while !left.is_empty() {
         merged.push_back(left.pop_front().unwrap());
+        stats.0 += 1;
     }
     while !right.is_empty() {
         merged.push_back(right.pop_front().unwrap());
+        stats.0 += 1;
     }
     let merged: Vec<u64> = Vec::from(merged);
     if print_proc {
