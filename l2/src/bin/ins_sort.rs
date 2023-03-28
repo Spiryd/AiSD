@@ -10,18 +10,19 @@ fn main(){
         if n_bytes == 0 {
             break; 
         }
-        list = line.split(" ").map(|x| x.parse::<u64>().unwrap()).collect();
+        list = line.split_whitespace().map(|x| x.parse::<u64>().unwrap()).collect();
         line.clear();
     }
     list = Vec::from(&list[1..]); 
-    println!("{:?}", list);
     let stats: (u32, u32);
     if list.len() < 40 {
+        print_as_two_digit(&list);
         stats = insertion_sort_with_stats(&mut list, true);
+        print_as_two_digit(&list);
     }else {
         stats = insertion_sort_with_stats(&mut list, false);
     }
-    println!("{:?}", list);
     println!("swaps = {}", stats.0);
-    println!("checks = {}", stats.1);
+    println!("cmp's = {}", stats.1);
+    println!("is sorted = {}", is_sorted(&list));
 }
