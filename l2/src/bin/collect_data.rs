@@ -28,7 +28,7 @@ fn main(){
         for _ in 0..100 {
             table = gen_list(i*1000, Order::Random);
             stats = merge_sort_with_stats(&mut table, false);
-            line = format!("merge;{};{};{}\n", i*10, stats.0, stats.1);
+            line = format!("merge;{};{};{}\n", i*1000, stats.0, stats.1);
             file.write_all(line.as_bytes()).unwrap();
         }
     }
@@ -44,7 +44,23 @@ fn main(){
         for _ in 0..100 {
             table = gen_list(i*1000, Order::Random);
             stats = quick_sort_with_stats(&mut table, false);
-            line = format!("quick;{};{};{}\n", i*10, stats.0, stats.1);
+            line = format!("quick;{};{};{}\n", i*1000, stats.0, stats.1);
+            file.write_all(line.as_bytes()).unwrap();
+        }
+    }
+    for i in 1..=20 {
+        for _ in 0..100 {
+            table = gen_list(i*10, Order::Random);
+            stats = dual_pivot_quicksort_with_stats(&mut table, false);
+            line = format!("dp_quick;{};{};{}\n", i*10, stats.0, stats.1);
+            file.write_all(line.as_bytes()).unwrap();
+        }
+    }
+    for i in 1..=20 {
+        for _ in 0..100 {
+            table = gen_list(i*1000, Order::Random);
+            stats = dual_pivot_quicksort_with_stats(&mut table, false);
+            line = format!("dp_quick;{};{};{}\n", i*1000, stats.0, stats.1);
             file.write_all(line.as_bytes()).unwrap();
         }
     }

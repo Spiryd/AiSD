@@ -287,8 +287,6 @@ pub fn dual_pivot_quicksort(table: &mut Vec<u64>){
 }
 
 fn _dual_pivot_quicksort(table: &mut Vec<u64>, left: usize, right: usize){
-    println!("{:?}", table);
-    println!("{left} , {right}");
     if left < right  {
         let p: u64;
         let q: u64;
@@ -297,7 +295,6 @@ fn _dual_pivot_quicksort(table: &mut Vec<u64>, left: usize, right: usize){
         }
         p = table[left];
         q = table[right];
-        
         let mut i = left + 1;
         let mut k = right - 1;
         let mut j = i;
@@ -315,7 +312,7 @@ fn _dual_pivot_quicksort(table: &mut Vec<u64>, left: usize, right: usize){
                     } else {
                       table.swap(j, k);
                       k -= 1;
-                      d -= 1;  
+                      d -= 1; 
                     }
                 }
             } else {
@@ -339,8 +336,88 @@ fn _dual_pivot_quicksort(table: &mut Vec<u64>, left: usize, right: usize){
         }
         table.swap(left, i - 1);
         table.swap(right, k + 1);
-        _dual_pivot_quicksort(table, left, i - 2);
+        if (i as isize - 2)  >= 0{
+            _dual_pivot_quicksort(table, left, i - 2);
+        }
         _dual_pivot_quicksort(table, i, k);
         _dual_pivot_quicksort(table, k + 2, right);
+    }
+}
+
+pub fn dual_pivot_quicksort_with_stats(table: &mut Vec<u64>, print_proc: bool) -> (u32, u32){
+    let mut stats: (u32, u32) = (0, 0);
+    _dual_pivot_quicksort_with_stats(table, 0, table.len() - 1, &mut stats, print_proc);
+    return stats;
+}
+
+fn _dual_pivot_quicksort_with_stats(table: &mut Vec<u64>, left: usize, right: usize, stats: &mut (u32, u32), print_proc: bool){
+    if left < right  {
+        if print_proc {
+            print_as_two_digit(table);
+        }
+        let p: u64;
+        let q: u64;
+        stats.1 += 1;
+        if table[right] < table[left] {
+            stats.0 += 1;
+            table.swap(right, left);
+        }
+        p = table[left];
+        q = table[right];
+        let mut i = left + 1;
+        let mut k = right - 1;
+        let mut j = i;
+        let mut d = 0;
+        while j <= k {
+            if d >= 0 {
+                stats.1 += 1;
+                if table[j] < p {
+                    stats.0 += 1;
+                    table.swap(i, j);
+                    i += 1;
+                    j += 1;
+                    d += 1;
+                } else {
+                    stats.1 += 1;
+                    if table[j] < q {
+                        j += 1;
+                    } else {
+                        stats.0 += 1;
+                        table.swap(j, k);
+                        k -= 1;
+                        d -= 1;
+                    }
+                }
+            } else {
+                stats.1 += 1;
+                if table[k] > q {
+                    k -= 1;
+                    d -= 1;
+                } else {
+                    stats.1 += 1;
+                    if table[k] < p {
+                        let tmp = table[k];
+                        table[k] = table[j];
+                        table[j] = table[i];
+                        table[i] = tmp;
+                        i += 1;
+                        d += 1;
+                    } else {
+                        stats.0 += 1;
+                        table.swap(j, k);
+                    }
+                    j += 1;
+                }
+            }
+        }
+        stats.0 += 1;
+        table.swap(left, i - 1);
+        stats.0 += 1;
+        table.swap(right, k + 1);
+        if (i as isize - 2)  >= 0{
+            _dual_pivot_quicksort_with_stats(table, left, i - 2, stats, print_proc);
+        }
+        _dual_pivot_quicksort_with_stats(table, i, k, stats, print_proc);
+        _dual_pivot_quicksort_with_stats(table, k + 2, right, stats, print_proc);
     }
 }
