@@ -281,3 +281,69 @@ fn merge_with_stats(left: Vec<u64>, right: Vec<u64>, stats: &mut (u32, u32), pri
     }
     return merged;
 }
+
+pub fn dual_pivot_quicksort(table: &mut Vec<u64>){
+    _dual_pivot_quicksort(table, 0, table.len() - 1)
+}
+
+fn _dual_pivot_quicksort(table: &mut Vec<u64>, low: usize, high: usize){
+    if high > low{
+        let p: u64;
+        let q: u64;
+        if table[high] < table[low] {
+            p = table[high];
+            q = table[low];
+        }else {
+            p = table[low];
+            q = table[high];  
+        }
+        let mut i = low + 1;
+        let mut k = high;
+        let mut j = i;
+        let mut d = 0;
+        while j <= k {
+            if d >= 0 {
+                if table[j] < p {
+                    table.swap(i, j);
+                    i += 1;
+                    j += 1;
+                    d += 1;
+                }else {
+                    if table[j] < q {
+                        j += 1;
+                    }else {
+                        table.swap(j, k);
+                        k -= 1;
+                        d -= 1;
+                    }
+                }
+            }else {
+                if table[k] > q {
+                    k -= 1;
+                    d -= 1;
+                }else {
+                    if table[k] < p {
+                       let tmp = table[k];
+                        table[k] = table[j];
+                        table[j] = table[i];
+                        table[i] = tmp;
+                        i += 1;
+                        d += 1;
+                    }else {
+                        table.swap(j, k)
+                    }
+                    j += 1;
+                }
+            }
+        }
+        table[low] = table[i - 1];
+        table[i - 1] = p;
+        table[high] = table[k + 1];
+        table[k + 1] = q;
+        if (i as isize - 2) >= 0{
+            _dual_pivot_quicksort(table, low, i - 2);
+        }
+        _dual_pivot_quicksort(table, i, k);
+        _dual_pivot_quicksort(table, k + 2, high);
+    }
+}

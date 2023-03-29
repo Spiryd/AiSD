@@ -2,3 +2,4 @@
 *.exe
 ._*
 target/
+*.csv
