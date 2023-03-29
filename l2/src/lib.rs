@@ -286,30 +286,61 @@ pub fn dual_pivot_quicksort(table: &mut Vec<u64>){
     _dual_pivot_quicksort(table, 0, table.len() - 1)
 }
 
-fn _dual_pivot_quicksort(table: &mut Vec<u64>, low: usize, high: usize){
-    if high > low{
-        if table[high] > table[low]{
-            table.swap(low, high);
+fn _dual_pivot_quicksort(table: &mut Vec<u64>, left: usize, right: usize){
+    println!("{:?}", table);
+    println!("{left} , {right}");
+    if left < right  {
+        let p: u64;
+        let q: u64;
+        if table[right] < table[left] {
+            table.swap(right, left);
         }
-        let p = table[low];
-        let q = table[high];
-        let mut pos_p = low;
-        let mut pos_q = high;
-        let (pos_p, pos_q) = dual_pivot_partition(table, p, q, low, high);
-        _dual_pivot_quicksort(table, low, pos_p - 1 );
-        _dual_pivot_quicksort(table, pos_p + 1, pos_q - 1);
-        _dual_pivot_quicksort(table, pos_q - 1 , high);
-    }
-}
-
-fn dual_pivot_partition(table: &mut Vec<u64>, p: u64, q: u64, low: usize, high: usize) -> (usize, usize){
-    let mut i = low + 1;
-    let mut k = high - 1;
-    let mut j = i;
-    let mut d = 0;
-    while j <= k {
+        p = table[left];
+        q = table[right];
         
+        let mut i = left + 1;
+        let mut k = right - 1;
+        let mut j = i;
+        let mut d = 0;
+        while j <= k {
+            if d >= 0 {
+                if table[j] < p {
+                    table.swap(i, j);
+                    i += 1;
+                    j += 1;
+                    d += 1;
+                } else {
+                    if table[j] < q {
+                        j += 1;
+                    } else {
+                      table.swap(j, k);
+                      k -= 1;
+                      d -= 1;  
+                    }
+                }
+            } else {
+                if table[k] > q {
+                    k -= 1;
+                    d -= 1;
+                } else {
+                    if table[k] < p {
+                        let tmp = table[k];
+                        table[k] = table[j];
+                        table[j] = table[i];
+                        table[i] = tmp;
+                        i += 1;
+                        d += 1;
+                    } else {
+                        table.swap(j, k);
+                    }
+                    j += 1;
+                }
+            }
+        }
+        table.swap(left, i - 1);
+        table.swap(right, k + 1);
+        _dual_pivot_quicksort(table, left, i - 2);
+        _dual_pivot_quicksort(table, i, k);
+        _dual_pivot_quicksort(table, k + 2, right);
     }
-
-    todo!()
 }
