@@ -64,4 +64,20 @@ fn main(){
             file.write_all(line.as_bytes()).unwrap();
         }
     }
+    for i in 1..=20 {
+        for _ in 0..100 {
+            table = gen_list(i*10, Order::Random);
+            stats = dual_pivot_quickinssort_with_stats(&mut table, false);
+            line = format!("combo;{};{};{}\n", i*10, stats.0, stats.1);
+            file.write_all(line.as_bytes()).unwrap();
+        }
+    }
+    for i in 1..=20 {
+        for _ in 0..100 {
+            table = gen_list(i*1000, Order::Random);
+            stats = dual_pivot_quickinssort_with_stats(&mut table, false);
+            line = format!("combo;{};{};{}\n", i*1000, stats.0, stats.1);
+            file.write_all(line.as_bytes()).unwrap();
+        }
+    }
 }

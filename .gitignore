@@ -4,3 +4,4 @@
 target/
 *.csv
 plots/
+*.csv
