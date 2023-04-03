@@ -4,3 +4,6 @@
 target/
 *.csv
 plots/
+*.lock
+*.csv
+l2/data.csv
