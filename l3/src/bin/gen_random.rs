@@ -1,4 +1,6 @@
 use lib::*;
+use rand::prelude::*;
+use rand_pcg::Pcg64;
 use std::env;
 
 fn main() {
@@ -7,7 +9,10 @@ fn main() {
         panic!("Expected n - length of list")
     }
     let length = args[1].parse::<u64>().unwrap();
+    let mut rng = Pcg64::from_entropy();
     let list = gen_list(length, Order::Random);
     print!("{length}");
+    print!(" {}", rng.gen_range(0..length));
+    print!(" ");
     print_to_std(list);
 }

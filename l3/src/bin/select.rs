@@ -17,7 +17,7 @@ fn main(){
     list = Vec::from(&list[2..]);
     let mut l_clone = list.clone();
     if l_clone.len() <= 50 {
-        let val = randomized_select_with_stats(&mut list, k as usize, true);
+        let val = select_with_stats(&mut list, k as usize, true);
         println!("after       = {:?}", list);
         println!("original    = {:?}", l_clone);
         println!("{k}th smallest element = {}", val.0);
@@ -25,7 +25,7 @@ fn main(){
         println!("list sorted = {:?}", l_clone);
         println!("cmps = {}, swaps = {}", val.1.0, val.1.1)
     } else {
-        let val = randomized_select_with_stats(&mut list, k as usize, false);
+        let val = select_with_stats(&mut list, k as usize, false);
         println!("cmps = {}, swaps = {}", val.1.0, val.1.1)
     }
 }

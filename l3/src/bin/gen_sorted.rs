@@ -12,8 +12,8 @@ fn main() {
     let mut rng = Pcg64::from_entropy();
     let list = gen_list(length, Order::Sorted);
     print!("{length}");
-    print!(" {}", rng.gen_range(1..=length));
-    print!("");
+    print!(" {}", rng.gen_range(0..length));
+    print!(" ");
     print_to_std(list);
 }
 
