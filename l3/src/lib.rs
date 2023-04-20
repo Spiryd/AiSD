@@ -319,6 +319,43 @@ fn partition5_with_stats(arr: &mut Vec<u64>, left: usize, right: usize, stats: &
     return (left + right) / 2;
 }
 
-pub fn contains_with_bs(arr: Vec<u64>, n: u64) -> bool {
-    todo!()
+pub fn rec_bin_search(arr: &Vec<u64>, n: u64) -> Result<usize, ()> {
+    return _rec_bin_search(arr, n, 0, arr.len() - 1);
+}
+
+fn _rec_bin_search(arr: &Vec<u64>, n: u64, left: usize, right: usize) -> Result<usize, ()> {
+    if left > right {
+        return Err(());
+    }
+    let mid = (left + right) / 2;
+    if n == arr[mid]{
+        return Ok(mid);
+    } else if n < arr[mid] {
+        return _rec_bin_search(arr, n, left , mid - 1);
+    } else {
+        return _rec_bin_search(arr, n, mid - 1 , right);
+    }
+}
+
+pub fn rec_bin_search_with_stats(arr: &Vec<u64>, n: u64) -> Result<(usize, u64), u64> {
+    let mut cmps = 0;
+    return _rec_bin_search_with_stats(arr, n, 0, arr.len() - 1, &mut cmps);
+}
+
+fn _rec_bin_search_with_stats(arr: &Vec<u64>, n: u64, left: usize, right: usize, cmps: &mut u64) -> Result<(usize, u64), u64> {
+    *cmps += 1;
+    if left > right {
+        return Err(*cmps);
+    }
+    let mid = (left + right) / 2;
+    *cmps += 1;
+    if n == arr[mid]{
+        return Ok((mid, *cmps));
+    }
+    *cmps += 1;
+    if n < arr[mid] {
+        return _rec_bin_search_with_stats(arr, n, left , mid - 1, cmps);
+    } else {
+        return _rec_bin_search_with_stats(arr, n, mid - 1 , right, cmps);
+    }
 }
