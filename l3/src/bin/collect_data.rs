@@ -4,7 +4,7 @@ use std::io::prelude::*;
 use rand::prelude::*;
 use rand_pcg::Pcg64;
 use std::thread;
-use std::time::Instant;
+use std::time::{Instant, Duration};
 
 fn main(){
     let data_thread1 = thread::spawn(|| {
@@ -57,21 +57,45 @@ fn main(){
 
     let data_thread3 = thread::spawn(|| {
         let mut file = File::create("bin_search_data1.csv").unwrap();
-        file.write_all(b"n;idx;cmps;time\n").unwrap();
+        file.write_all(b"target;n;cmps;time\n").unwrap();
         let mut cmps: u64;
         let mut list: Vec<u64>;
         let mut line: String;
         let mut start: Instant;
+        let mut time: Duration;
         for n in (1000..=100000).step_by(1000) {
-            for target_idx in [n/12, (7*n)/12, (11*n)/12]{
+            list = (0..n).collect();
+            for target in [3, n/12, (7 * n)/12, (11 * n)/12, n-4]{
                 for _ in 0..100{
-                    list = gen_list(n, Order::Sorted);
                     start = Instant::now();
-                    match rec_bin_search_with_stats(&list, list[target_idx as usize]) {
-                        Ok(_) => todo!(),
-                        Err(_) => todo!(),
-                    }
+                    cmps = bin_is_in_with_stats(target, list.clone()).1;
+                    time = start.elapsed();
+                    line = format!("{target};{n};{cmps};{}\n", time.as_nanos());
+                    file.write_all(line.as_bytes()).unwrap();
                 }
+            }
+        }
+    });
+
+    let data_thread4 = thread::spawn(|| {
+        let mut file = File::create("bin_search_data2.csv").unwrap();
+        file.write_all(b"n;cmps;time\n").unwrap();
+        let mut cmps: u64;
+        let mut list: Vec<u64>;
+        let mut line: String;
+        let mut start: Instant;
+        let mut time: Duration;
+        let mut rng = Pcg64::from_entropy();
+        let mut choosen: u64;
+        for n in (1000..=100000).step_by(1000) {
+            list = (0..n).collect();
+            for _ in 0..1000{
+                choosen = rng.gen_range(0..n);
+                start = Instant::now();
+                cmps = bin_is_in_with_stats(choosen, list.clone()).1;
+                time = start.elapsed();
+                line = format!("{n};{cmps};{}\n", time.as_nanos());
+                file.write_all(line.as_bytes()).unwrap();
             }
         }
     });
@@ -79,4 +103,5 @@ fn main(){
     data_thread1.join().unwrap();
     data_thread2.join().unwrap();
     data_thread3.join().unwrap();
+    data_thread4.join().unwrap();
 }

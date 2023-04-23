@@ -1,5 +1,6 @@
 use rand::prelude::*;
 use rand_pcg::Pcg64;
+use std::cmp::Ordering;
 
 #[test]
 fn test_rselect() {
@@ -22,6 +23,16 @@ fn test_select() {
         let val = select(&mut list.clone(), i, 5);
         list.sort();
         assert_eq!(list[i], val);
+    }
+}
+
+#[test]
+fn test_bin_search(){
+    let list: Vec<u64> = (0..1000).collect();
+    for _ in 0..100{
+        for target in [10, 250, 500, 750, 990]{
+            assert!(bin_is_in(target, list.clone()));
+        }
     }
 }
 
@@ -319,43 +330,38 @@ fn partition5_with_stats(arr: &mut Vec<u64>, left: usize, right: usize, stats: &
     return (left + right) / 2;
 }
 
-pub fn rec_bin_search(arr: &Vec<u64>, n: u64) -> Result<usize, ()> {
-    return _rec_bin_search(arr, n, 0, arr.len() - 1);
+pub fn bin_is_in(k: u64, items: Vec<u64>) -> bool {
+    let low: usize = 0;
+    let high: usize = items.len() - 1;
+ 
+    if low < high {
+        let middle = (high + low) / 2;
+        println!("{middle}");
+        match items[middle].cmp(&k) {
+            Ordering::Equal => return true,
+            Ordering::Greater => return bin_is_in(k, items[low ..= middle - 1].to_vec()),
+            Ordering::Less => return bin_is_in(k, items[middle + 1 ..= high].to_vec())
+        }
+    }
+    return false;
 }
 
-fn _rec_bin_search(arr: &Vec<u64>, n: u64, left: usize, right: usize) -> Result<usize, ()> {
-    if left > right {
-        return Err(());
-    }
-    let mid = (left + right) / 2;
-    if n == arr[mid]{
-        return Ok(mid);
-    } else if n < arr[mid] {
-        return _rec_bin_search(arr, n, left , mid - 1);
-    } else {
-        return _rec_bin_search(arr, n, mid - 1 , right);
-    }
+pub fn bin_is_in_with_stats(k: u64, items: Vec<u64>) -> (bool, u64) {
+    let mut stats = 0;
+    _bin_is_in_with_stats(k, items, &mut stats)
 }
 
-pub fn rec_bin_search_with_stats(arr: &Vec<u64>, n: u64) -> Result<(usize, u64), u64> {
-    let mut cmps = 0;
-    return _rec_bin_search_with_stats(arr, n, 0, arr.len() - 1, &mut cmps);
-}
-
-fn _rec_bin_search_with_stats(arr: &Vec<u64>, n: u64, left: usize, right: usize, cmps: &mut u64) -> Result<(usize, u64), u64> {
-    *cmps += 1;
-    if left > right {
-        return Err(*cmps);
+fn _bin_is_in_with_stats(k: u64, items: Vec<u64>, stats: &mut u64) -> (bool, u64) {
+    let low: usize = 0;
+    let high: usize = items.len() - 1;
+ 
+    if low < high {
+        let middle = (high + low) / 2;
+        match items[middle].cmp(&k) {
+            Ordering::Equal => return (true, *stats),
+            Ordering::Greater => return _bin_is_in_with_stats(k, items[low ..= middle - 1].to_vec(), stats),
+            Ordering::Less => return _bin_is_in_with_stats(k, items[middle + 1 ..= high].to_vec(), stats)
+        }
     }
-    let mid = (left + right) / 2;
-    *cmps += 1;
-    if n == arr[mid]{
-        return Ok((mid, *cmps));
-    }
-    *cmps += 1;
-    if n < arr[mid] {
-        return _rec_bin_search_with_stats(arr, n, left , mid - 1, cmps);
-    } else {
-        return _rec_bin_search_with_stats(arr, n, mid - 1 , right, cmps);
-    }
+    return (false, *stats);
 }
