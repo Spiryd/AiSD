@@ -36,11 +36,29 @@ fn test_bin_search(){
     }
 }
 
+#[test]
+fn test_qs_select(){
+    for _ in 0..1000 {
+        let mut list = gen_list(32, Order::Random);
+        quicksort_select(&mut list);
+        assert!(is_sorted(&list));
+    }
+}
+
 #[derive(Debug)]
 pub enum Order{
     Random,
     Sorted,
     Reverse
+}
+
+pub fn is_sorted(table: &Vec<u64>) -> bool{
+    for i in 1..table.len(){
+        if table[i] < table[i-1]{
+            return false;
+        }
+    }
+    return true;
 }
 
 pub fn gen_list(n: u64, order: Order) -> Vec<u64>{
@@ -364,4 +382,14 @@ fn _bin_is_in_with_stats(k: u64, items: Vec<u64>, stats: &mut u64) -> (bool, u64
         }
     }
     return (false, *stats);
+}
+
+pub fn quicksort_select(arr: &mut Vec<u64>) {
+    _quicksort_select(arr, 0, arr.len() - 1);
+}
+ 
+fn _quicksort_select(arr: &mut Vec<u64>, low: usize, high: usize){
+    if low < high {
+        todo!()
+    }
 }

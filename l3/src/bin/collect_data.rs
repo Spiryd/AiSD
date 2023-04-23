@@ -65,7 +65,7 @@ fn main(){
         let mut time: Duration;
         for n in (1000..=100000).step_by(1000) {
             list = (0..n).collect();
-            for target in [3, n/12, (7 * n)/12, (11 * n)/12, n-4]{
+            for target in [3, n/12, (7 * n)/12, (11 * n)/12, n-4, n]{
                 for _ in 0..100{
                     start = Instant::now();
                     cmps = bin_is_in_with_stats(target, list.clone()).1;
