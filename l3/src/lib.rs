@@ -67,7 +67,7 @@ pub fn is_sorted(table: &Vec<u64>) -> bool{
             return false;
         }
     }
-    return true;
+    true
 }
 
 pub fn gen_list(n: u64, order: Order) -> Vec<u64>{
@@ -77,15 +77,15 @@ pub fn gen_list(n: u64, order: Order) -> Vec<u64>{
         vector.push(rng.gen_range(0..2*n));
     }
     match order {
-        Order::Random => return vector,
+        Order::Random => vector,
         Order::Sorted => {
             vector.sort();
-            return vector;
+            vector
         },
         Order::Reverse => {
             vector.sort();
             vector.reverse();
-            return vector;
+            vector
         },
     }
 }
@@ -107,16 +107,14 @@ fn _randomized_select(arr: &mut Vec<u64>, left: usize, right: usize, n: usize) -
     }
     let pivot_index = randomized_partition(arr, left, right);
     let k = pivot_index - left + 1;
-    if n == k {
-        return arr[pivot_index];
-    } else if n < k {
-        return _randomized_select(arr, left, pivot_index - 1, n);
-    } else {
-        return _randomized_select(arr, pivot_index + 1, right, n - k);
+    match n.cmp(&k) {
+        Ordering::Less => _randomized_select(arr, left, pivot_index - 1, n),
+        Ordering::Equal => arr[pivot_index],
+        Ordering::Greater => _randomized_select(arr, pivot_index + 1, right, n - k),
     }
 }
 
-fn randomized_partition(arr: &mut Vec<u64>, left: usize, right: usize) -> usize {
+fn randomized_partition(arr: &mut [u64], left: usize, right: usize) -> usize {
     let mut rng = Pcg64::from_entropy();
     let mut pivot_index: usize = left;
     if left < right {
@@ -131,13 +129,13 @@ fn randomized_partition(arr: &mut Vec<u64>, left: usize, right: usize) -> usize 
         }
     }
     arr.swap(i, right);
-    return i;
+    i
 }
 
 pub fn randomized_select_with_stats(arr: &mut Vec<u64>, n: usize, print_process: bool) -> (u64, (u64, u64)) {
     let mut stats = (0, 0);
     let val = _randomized_select_with_stats(arr, 0, arr.len() - 1, n + 1, print_process, &mut stats);
-    return (val, stats);
+    (val, stats)
 }
 
 fn _randomized_select_with_stats(arr: &mut Vec<u64>, left: usize, right: usize, n: usize, print_process: bool, stats: &mut(u64, u64)) -> u64 {
@@ -149,16 +147,14 @@ fn _randomized_select_with_stats(arr: &mut Vec<u64>, left: usize, right: usize, 
     }
     let pivot_index = randomized_partition_with_stats(arr, left, right, stats);
     let k = pivot_index - left + 1;
-    if n == k {
-        return arr[pivot_index];
-    } else if n < k {
-        return _randomized_select_with_stats(arr, left, pivot_index - 1, n, print_process, stats);
-    } else {
-        return _randomized_select_with_stats(arr, pivot_index + 1, right, n - k, print_process, stats);
+    match n.cmp(&k) {
+        Ordering::Less => _randomized_select_with_stats(arr, left, pivot_index - 1, n, print_process, stats),
+        Ordering::Equal => arr[pivot_index],
+        Ordering::Greater => _randomized_select_with_stats(arr, pivot_index + 1, right, n - k, print_process, stats),
     }
 }
 
-fn randomized_partition_with_stats(arr: &mut Vec<u64>, left: usize, right: usize, stats: &mut(u64, u64)) -> usize{
+fn randomized_partition_with_stats(arr: &mut [u64], left: usize, right: usize, stats: &mut(u64, u64)) -> usize{
     let mut rng = Pcg64::from_entropy();
     let mut pivot_index: usize = left;
     if left < right {
@@ -177,7 +173,7 @@ fn randomized_partition_with_stats(arr: &mut Vec<u64>, left: usize, right: usize
     }
     stats.1 += 1;
     arr.swap(i, right);
-    return i;
+    i
 }
 
 pub fn select(arr: &mut Vec<u64>, n: usize, partition_size: usize) -> u64{
@@ -192,17 +188,15 @@ fn _select(arr: &mut Vec<u64>, mut left: usize, mut right: usize, n: usize, part
         }
         let mut pivot_index = select_pivot(arr, left, right, partition_size);
         pivot_index = select_partition(arr, left, right, pivot_index, n);
-        if n == pivot_index {
-            return n;
-        } else if n < pivot_index {
-            right = pivot_index - 1
-        } else {
-            left = pivot_index + 1
+        match n.cmp(&pivot_index) {
+            Ordering::Less => right = pivot_index - 1,
+            Ordering::Equal => return n,
+            Ordering::Greater => left = pivot_index + 1,
         }
     }
 }
 
-fn select_partition(arr: &mut Vec<u64>, left: usize, right: usize, pivot_index: usize, n: usize) -> usize {
+fn select_partition(arr: &mut [u64], left: usize, right: usize, pivot_index: usize, n: usize) -> usize {
     let pivot_value =  arr[pivot_index];
     arr.swap(pivot_index, right);
     let mut store_index = left;
@@ -226,7 +220,7 @@ fn select_partition(arr: &mut Vec<u64>, left: usize, right: usize, pivot_index: 
     if n <= store_index_eq {
         return n;
     }
-    return store_index_eq;
+    store_index_eq
 }
 
 fn select_pivot(arr: &mut Vec<u64>, left: usize, right: usize, partition_size: usize) -> usize {
@@ -242,10 +236,10 @@ fn select_pivot(arr: &mut Vec<u64>, left: usize, right: usize, partition_size: u
         arr.swap(med5, left + ((i - left)/partition_size));
     }
     let mid = ((right - left)/(partition_size*2)) + left + 1;
-    return _select(arr, left, left + ((right - left)/partition_size), mid, partition_size);
+    _select(arr, left, left + ((right - left)/partition_size), mid, partition_size)
 }
 
-fn partition5(arr: &mut Vec<u64>, left: usize, right: usize) -> usize {
+fn partition5(arr: &mut [u64], left: usize, right: usize) -> usize {
     let mut i = left + 1;
     let mut j: usize;
     while i <= right {
@@ -258,14 +252,14 @@ fn partition5(arr: &mut Vec<u64>, left: usize, right: usize) -> usize {
             i += 1;
         }
     }
-    return (left + right) / 2;
+    (left + right) / 2
 }
 
 pub fn select_with_stats(arr: &mut Vec<u64>, n: usize, partition_size: usize, print_process: bool) -> (u64, (u64, u64)){
     let mut stats = (0, 0);
     let idx = _select_with_stats(arr, 0, arr.len() - 1, n, partition_size, print_process, &mut stats);
     let val = arr[idx];
-    return (val, stats);
+    (val, stats)
 }
 
 fn _select_with_stats(arr:  &mut Vec<u64>, mut left: usize, mut right: usize, n: usize, partition_size: usize, print_process: bool, stats: &mut (u64, u64)) -> usize {
@@ -278,12 +272,10 @@ fn _select_with_stats(arr:  &mut Vec<u64>, mut left: usize, mut right: usize, n:
         }
         let mut pivot_index = select_pivot_with_stats(arr, left, right, partition_size, print_process, stats);
         pivot_index = select_partition_with_stats(arr, left, right, pivot_index, n, stats);
-        if n == pivot_index {
-            return n;
-        } else if n < pivot_index {
-            right = pivot_index - 1
-        } else {
-            left = pivot_index + 1
+        match n.cmp(&pivot_index) {
+            Ordering::Less => right = pivot_index - 1,
+            Ordering::Equal => return n,
+            Ordering::Greater => left = pivot_index + 1,
         }
     }
 }
@@ -302,10 +294,10 @@ fn select_pivot_with_stats(arr: &mut Vec<u64>, left: usize, right: usize, partit
         arr.swap(med5, left + ((i - left)/5));
     }
     let mid = ((right - left)/(partition_size*2)) + left + 1;
-    return _select_with_stats(arr, left, left + ((right - left)/partition_size), mid, partition_size, print_process, stats);
+    _select_with_stats(arr, left, left + ((right - left)/partition_size), mid, partition_size, print_process, stats)
 }
 
-fn select_partition_with_stats(arr: &mut Vec<u64>, left: usize, right: usize, pivot_index: usize, n: usize, stats: &mut (u64, u64)) -> usize {
+fn select_partition_with_stats(arr: &mut [u64], left: usize, right: usize, pivot_index: usize, n: usize, stats: &mut (u64, u64)) -> usize {
     let pivot_value =  arr[pivot_index];
     stats.1 += 1;
     arr.swap(pivot_index, right);
@@ -335,10 +327,10 @@ fn select_partition_with_stats(arr: &mut Vec<u64>, left: usize, right: usize, pi
     if n <= store_index_eq {
         return n;
     }
-    return store_index_eq;
+    store_index_eq
 }
 
-fn partition5_with_stats(arr: &mut Vec<u64>, left: usize, right: usize, stats: &mut (u64, u64)) -> usize {
+fn partition5_with_stats(arr: &mut [u64], left: usize, right: usize, stats: &mut (u64, u64)) -> usize {
     let mut i = left + 1;
     let mut j: usize;
     while i <= right {
@@ -354,7 +346,7 @@ fn partition5_with_stats(arr: &mut Vec<u64>, left: usize, right: usize, stats: &
             i += 1;
         }
     }
-    return (left + right) / 2;
+    (left + right) / 2
 }
 
 pub fn bin_is_in(k: u64, items: Vec<u64>) -> bool {
@@ -370,7 +362,7 @@ pub fn bin_is_in(k: u64, items: Vec<u64>) -> bool {
             Ordering::Less => return bin_is_in(k, items[middle + 1 ..= high].to_vec())
         }
     }
-    return false;
+    false
 }
 
 pub fn bin_is_in_with_stats(k: u64, items: Vec<u64>) -> (bool, u64) {
@@ -390,7 +382,7 @@ fn _bin_is_in_with_stats(k: u64, items: Vec<u64>, stats: &mut u64) -> (bool, u64
             Ordering::Less => return _bin_is_in_with_stats(k, items[middle + 1 ..= high].to_vec(), stats)
         }
     }
-    return (false, *stats);
+    (false, *stats)
 }
 
 pub fn quicksort_select(arr: &mut Vec<u64>) {
@@ -430,20 +422,6 @@ fn partition(arr: &mut Vec<u64>, low: usize, high: usize) -> usize{
     }
 }
 
-pub fn dp_quicksort_select(arr: &mut Vec<u64>) {
-    _dp_quicksort_select(arr, 0, arr.len() - 1);
-}
- 
-fn _dp_quicksort_select(arr: &mut Vec<u64>, low: usize, high: usize){
-    if low < high {
-        let (p, q) = dp_partition(arr, low, high);
-        _dp_quicksort_select(arr, low, p);
-        _dp_quicksort_select(arr, p + 1, q);
-        _dp_quicksort_select(arr, q + 1, high);
-    }
-}
-
-fn dp_partition(arr: &mut Vec<u64>, low: usize, high: usize) -> (usize, usize){
-    let pivot = select_pivot(arr, low, high, 5);
+pub fn dp_quicksort_select(_arr: &mut Vec<u64>){
     todo!()
 }
