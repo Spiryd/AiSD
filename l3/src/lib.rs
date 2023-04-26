@@ -6,7 +6,7 @@ use std::cmp::Ordering;
 fn test_rselect() {
     let mut rng = Pcg64::from_entropy();
     for _ in 0..1000 {
-        let mut list = gen_list(32, Order::Random);
+        let mut list = gen_list(256 , Order::Random);
         let i = rng.gen_range(0..32);
         let val = randomized_select(&mut list.clone(), i);
         list.sort();
@@ -39,8 +39,17 @@ fn test_bin_search(){
 #[test]
 fn test_qs_select(){
     for _ in 0..1000 {
-        let mut list = gen_list(32, Order::Random);
+        let mut list = gen_list(256, Order::Random);
         quicksort_select(&mut list);
+        assert!(is_sorted(&list));
+    }
+}
+
+#[test]
+fn test_dp_qs_select(){
+    for _ in 0..1000 {
+        let mut list = gen_list(256, Order::Random);
+        dp_quicksort_select(&mut list);
         assert!(is_sorted(&list));
     }
 }
@@ -390,6 +399,51 @@ pub fn quicksort_select(arr: &mut Vec<u64>) {
  
 fn _quicksort_select(arr: &mut Vec<u64>, low: usize, high: usize){
     if low < high {
-        todo!()
+        let p = partition(arr, low, high);
+        _quicksort_select(arr, low, p);
+        _quicksort_select(arr, p + 1, high);
     }
+}
+
+fn partition(arr: &mut Vec<u64>, low: usize, high: usize) -> usize{
+    let pivot = select_pivot(arr, low, high, 5);
+    let pivot = arr[pivot];
+    let mut left_index = (low  as isize) - 1;
+    let mut right_index = (high + 1) as isize;
+    loop {
+        loop {
+            left_index += 1;
+            if arr[left_index as usize] >= pivot{
+                break;
+            }
+        }
+        loop {
+            right_index -= 1;
+            if arr[right_index as usize] <= pivot{
+                break;
+            }
+        }
+        if left_index >= right_index{
+            return right_index as usize;
+        }
+        arr.swap(left_index as usize, right_index as usize);
+    }
+}
+
+pub fn dp_quicksort_select(arr: &mut Vec<u64>) {
+    _dp_quicksort_select(arr, 0, arr.len() - 1);
+}
+ 
+fn _dp_quicksort_select(arr: &mut Vec<u64>, low: usize, high: usize){
+    if low < high {
+        let (p, q) = dp_partition(arr, low, high);
+        _dp_quicksort_select(arr, low, p);
+        _dp_quicksort_select(arr, p + 1, q);
+        _dp_quicksort_select(arr, q + 1, high);
+    }
+}
+
+fn dp_partition(arr: &mut Vec<u64>, low: usize, high: usize) -> (usize, usize){
+    let pivot = select_pivot(arr, low, high, 5);
+    todo!()
 }
