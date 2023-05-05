@@ -18,7 +18,7 @@ fn test_rselect() {
 fn test_select() {
     let mut rng = Pcg64::from_entropy();
     for _ in 0..1000 {
-        let mut list = gen_list(32, Order::Random);
+        let mut list = gen_list(256, Order::Random);
         let i = rng.gen_range(0..32);
         let val = select(&mut list.clone(), i, 5);
         list.sort();
@@ -49,7 +49,7 @@ fn test_qs_select(){
 fn test_dp_qs_select(){
     for _ in 0..1000 {
         let mut list = gen_list(256, Order::Random);
-        dp_quicksort_select(&mut list);
+        dp_quicksort_select_with_stats(&mut list);
         assert!(is_sorted(&list));
     }
 }
@@ -376,6 +376,7 @@ fn _bin_is_in_with_stats(k: u64, items: Vec<u64>, stats: &mut u64) -> (bool, u64
  
     if low < high {
         let middle = (high + low) / 2;
+        *stats += 2;
         match items[middle].cmp(&k) {
             Ordering::Equal => return (true, *stats),
             Ordering::Greater => return _bin_is_in_with_stats(k, items[low ..= middle - 1].to_vec(), stats),
@@ -422,6 +423,243 @@ fn partition(arr: &mut Vec<u64>, low: usize, high: usize) -> usize{
     }
 }
 
-pub fn dp_quicksort_select(_arr: &mut Vec<u64>){
-    todo!()
+pub fn quicksort_select_with_stats(arr: &mut Vec<u64>) -> u64{
+    let mut stats = (0, 0);
+    _quicksort_select_with_stats(arr, 0, arr.len() - 1, &mut stats);
+    stats.0
+}
+
+fn _quicksort_select_with_stats(arr: &mut Vec<u64>, low: usize, high: usize, stats: &mut (u64, u64)){
+    if low < high {
+        let p = partition_with_stats(arr, low, high, stats);
+        _quicksort_select_with_stats(arr, low, p, stats);
+        _quicksort_select_with_stats(arr, p + 1, high, stats);
+    }
+}
+
+fn partition_with_stats(arr: &mut Vec<u64>, low: usize, high: usize, stats: &mut (u64, u64)) -> usize{
+    let pivot = select_pivot_with_stats(arr, low, high, 5, false, stats);
+    let pivot = arr[pivot];
+    let mut left_index = (low  as isize) - 1;
+    let mut right_index = (high + 1) as isize;
+    loop {
+        loop {
+            left_index += 1;
+            stats.0 += 1;
+            if arr[left_index as usize] >= pivot{
+                break;
+            }
+        }
+        loop {
+            right_index -= 1;
+            stats.0 += 1;
+            if arr[right_index as usize] <= pivot{
+                break;
+            }
+        }
+        if left_index >= right_index{
+            return right_index as usize;
+        }
+        stats.1 += 1;
+        arr.swap(left_index as usize, right_index as usize);
+    }
+}
+
+pub fn dp_quicksort_select_with_stats(arr: &mut Vec<u64>) -> u64{
+    let mut stats = (0, 0);
+    _dp_quicksort_select_with_stats(arr, 0, arr.len() - 1, &mut stats);
+    stats.0
+}
+
+pub fn _dp_quicksort_select_with_stats(arr: &mut Vec<u64>, left: usize, right: usize, stats: &mut (u64, u64)){
+    if left < right{
+        let mid = (left + right)/2;
+        let p_idx = select_pivot_with_stats(arr, left, mid, 5, false, stats);
+        let q_idx = select_pivot_with_stats(arr, mid + 1, right, 5, false, stats);
+        let p: u64;
+        let q: u64;
+        arr.swap(left, p_idx);
+        arr.swap(right, q_idx);
+        stats.0 += 1;
+        if arr[right] < arr[left] {
+            p = arr[right];
+            q = arr[left];
+        } else {
+            q = arr[right];
+            p = arr[left];
+        }
+        let mut i = left + 1;
+        let mut k = right - 1;
+        let mut j = i;
+        let mut d = 0;
+        while j <= k {
+            stats.0 += 1;
+            if d >= 0{
+                stats.0 += 1;
+                if arr[j] < p {
+                    stats.1 += 1;
+                    arr.swap(i, j);
+                    i += 1;
+                    j += 1;
+                    d += 1;
+                } else if arr[j] < q {
+                    stats.0 += 1;
+                    j += 1;
+                    
+                } else {
+                    stats.0 += 1;
+                    stats.1 += 1;
+                    arr.swap(j, k);
+                    k -= 1;
+                    d -= 1;
+                }
+            } else if arr[k] > q {
+                stats.0 += 1;
+                k -= 1;
+                d -= 1;
+            } else {
+                stats.0 += 1;
+                if arr[k] < p {
+                    stats.1 += 3;
+                    let tmp = arr[k];
+                    arr[k] = arr[j];
+                    arr[j] = arr[i];
+                    arr[i] = tmp;
+                    i += 1;
+                    d += 1;
+                } else {
+                    stats.1 += 1;
+                    arr.swap(j, k)
+                }
+                j += 1;
+            }
+        }
+        stats.1 += 4;
+        arr[left] = arr[i - 1];
+        arr[i - 1] = p;
+        arr[right] = arr[k + 1];
+        arr[k + 1] = q;
+        if (i as isize - 2)  >= 0{
+            _dp_quicksort_select_with_stats(arr, left, i - 2, stats);
+        }
+        _dp_quicksort_select_with_stats(arr, i, k, stats);
+        _dp_quicksort_select_with_stats(arr, k + 2, right, stats);
+    }
+}
+
+pub fn dual_pivot_quicksort_with_stats(table: &mut Vec<u64>) -> u64{
+    let mut stats: (u64, u64) = (0, 0);
+    _dual_pivot_quicksort_with_stats(table, 0, table.len() - 1, &mut stats);
+    stats.1
+}
+
+fn _dual_pivot_quicksort_with_stats(table: &mut Vec<u64>, left: usize, right: usize, stats: &mut (u64, u64)){
+    if left < right  {
+        stats.1 += 1;
+        if table[right] < table[left] {
+            stats.0 += 1;
+            table.swap(right, left);
+        }
+        let p = table[left];
+        let q = table[right];
+        let mut i = left + 1;
+        let mut k = right - 1;
+        let mut j = i;
+        let mut d = 0;
+        while j <= k {
+            if d >= 0 {
+                stats.1 += 1;
+                if table[j] < p {
+                    stats.0 += 1;
+                    table.swap(i, j);
+                    i += 1;
+                    j += 1;
+                    d += 1;
+                } else {
+                    stats.1 += 1;
+                    if table[j] < q {
+                        j += 1;
+                    } else {
+                        stats.0 += 1;
+                        table.swap(j, k);
+                        k -= 1;
+                        d -= 1;
+                    }
+                }
+            } else {
+                stats.1 += 1;
+                if table[k] > q {
+                    k -= 1;
+                    d -= 1;
+                } else {
+                    stats.1 += 1;
+                    if table[k] < p {
+                        let tmp = table[k];
+                        table[k] = table[j];
+                        table[j] = table[i];
+                        table[i] = tmp;
+                        i += 1;
+                        d += 1;
+                    } else {
+                        stats.0 += 1;
+                        table.swap(j, k);
+                    }
+                    j += 1;
+                }
+            }
+        }
+        stats.0 += 1;
+        table.swap(left, i - 1);
+        stats.0 += 1;
+        table.swap(right, k + 1);
+        if (i as isize - 2)  >= 0{
+            _dual_pivot_quicksort_with_stats(table, left, i - 2, stats);
+        }
+        _dual_pivot_quicksort_with_stats(table, i, k, stats);
+        _dual_pivot_quicksort_with_stats(table, k + 2, right, stats);
+    }
+}
+
+pub fn quick_sort_with_stats(table: &mut Vec<u64>, print_proc: bool) ->  u64{
+    //(num of swaps, num od cmp)
+    let mut stats: (u64, u64) = (0, 0);
+    if !table.is_empty(){
+        _quick_sort_with_stats(table, 0, table.len() - 1, &mut stats, print_proc);
+    }
+    stats.1
+}
+
+fn qs_partition_with_stats(table: &mut [u64], low: usize, high: usize, stats: &mut (u64, u64), _print_proc: bool) -> usize{
+    let pivot = table[(((((high - low)/2) as f64).floor()) as usize) + low];
+    let mut left_index = (low  as isize) - 1;
+    let mut right_index = (high + 1) as isize;
+    loop {
+        loop {
+            left_index += 1;
+            stats.1 += 1;
+            if table[left_index as usize] >= pivot{
+                break;
+            }
+        }
+        loop {
+            right_index -= 1;
+            stats.1 += 1;
+            if table[right_index as usize] <= pivot{
+                break;
+            }
+        }
+        if left_index >= right_index{
+            return right_index as usize;
+        }
+        stats.0 += 1;
+        table.swap(left_index as usize, right_index as usize);
+    }
+}
+
+fn _quick_sort_with_stats(table: &mut Vec<u64>, low: usize, high: usize, stats: &mut (u64, u64), print_proc: bool){
+    if low < high {
+        let p = qs_partition_with_stats(table, low, high, stats, print_proc);
+        _quick_sort_with_stats(table, low, p, stats, print_proc);
+        _quick_sort_with_stats(table, p + 1, high, stats, print_proc);
+    }
 }
