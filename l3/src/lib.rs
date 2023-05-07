@@ -29,12 +29,10 @@ fn test_select() {
 #[test]
 fn test_bin_search(){
     let list: Vec<u64> = (0..1000).collect();
-    for _ in 0..100{
-        for target in [10, 250, 500, 750, 990]{
+        for target in 0..1000 {
             assert!(bin_is_in(target, list.clone()));
         }
     }
-}
 
 #[test]
 fn test_qs_select(){
@@ -352,10 +350,13 @@ fn partition5_with_stats(arr: &mut [u64], left: usize, right: usize, stats: &mut
 pub fn bin_is_in(k: u64, items: Vec<u64>) -> bool {
     let low: usize = 0;
     let high: usize = items.len() - 1;
- 
-    if low < high {
+
+
+    if low <= high {
         let middle = (high + low) / 2;
-        println!("{middle}");
+        if middle > items.len(){
+            return false;
+        }
         match items[middle].cmp(&k) {
             Ordering::Equal => return true,
             Ordering::Greater => return bin_is_in(k, items[low ..= middle - 1].to_vec()),
