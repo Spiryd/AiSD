@@ -2,21 +2,21 @@ mod trees;
 use trees::*;
 
 fn main() {
-    let mut tree = BST::new();
-    tree.insert(5);
-    tree.insert(3);
-    tree.insert(7);
-    tree.insert(1);
-    tree.insert(9);
-    tree.insert(4);
-    tree.insert(2);
-
-    assert_eq!(tree.search(5), true);
-
+    let mut tree = BinarySearchTree::new(); 
+    tree.insert(50);
+    tree.insert(30);
+    tree.insert(20);
+    tree.insert(40);
+    tree.insert(70);
+    tree.insert(60);
+    tree.insert(80);
+    
     tree.print();
-    tree.delete(5);
 
-    assert_eq!(tree.search(5), false);
-    tree.print()
+    println!("Tree height: {}", tree.height());
+    println!("Contains 20: {}", tree.search(20));
+    println!("Contains 10: {}", tree.search(10));
 
+    tree.delete(30);
+    tree.print();
 }
