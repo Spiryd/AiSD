@@ -1,22 +1,19 @@
-mod trees;
-use trees::*;
+use lib::*;
 
 fn main() {
-    let mut tree = BinarySearchTree::new(); 
-    tree.insert(50);
-    tree.insert(30);
-    tree.insert(20);
-    tree.insert(40);
-    tree.insert(70);
-    tree.insert(60);
-    tree.insert(80);
+    let mut b_tree = BinarySearchTree::new();
+    let items = gen_list(50, Order::Random);
+    for item in &items{
+        b_tree.insert(*item);
+    }
     
-    tree.print();
+    b_tree.print();
 
-    println!("Tree height: {}", tree.height());
-    println!("Contains 20: {}", tree.search(20));
-    println!("Contains 10: {}", tree.search(10));
+    println!("Tree height: {}", b_tree.height());
 
-    tree.delete(30);
-    tree.print();
+    let mut rb_tree = RBTree::new();
+    for item in &items{
+        rb_tree.insert(*item);
+    }
+    rb_tree.print_tree();
 }
