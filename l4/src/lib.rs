@@ -369,3 +369,38 @@ impl RBTree {
         }
     }
 }
+
+#[derive(Debug, Clone)]
+struct SplayNode {
+    value: u64,
+    left: Option<Box<RBNode>>,
+    right: Option<Box<RBNode>>,
+}
+
+impl SplayNode {
+    fn new(value: u64) -> Self {
+        SplayNode { value , left: None, right: None }
+    }
+}
+
+pub struct SplayTree {
+    root: Option<Box<RBNode>>,
+}
+
+impl SplayTree {
+    pub fn new() -> Self {
+        SplayTree { root: None }
+    }
+
+    fn splay(&mut self, value: u64) {
+        
+    }
+
+    pub fn insert(&mut self, value: u64) {
+        
+    }
+
+    pub fn search(&mut self, value: u64) {
+        
+    }
+}
