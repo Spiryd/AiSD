@@ -6,9 +6,7 @@ fn main() {
     for item in &items{
         b_tree.insert(*item);
     }
-    
     b_tree.print();
-
     println!("Tree height: {}", b_tree.height());
 
     let mut rb_tree = RBTree::new();
@@ -16,4 +14,5 @@ fn main() {
         rb_tree.insert(*item);
     }
     rb_tree.print_tree();
+    println!("Tree height: {}", rb_tree.height());
 }

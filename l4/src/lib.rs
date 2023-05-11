@@ -1,5 +1,4 @@
 use std::cmp::Ordering;
-use std::fmt::Write;
 use rand::prelude::*;
 use rand_pcg::Pcg64;
 
@@ -96,25 +95,18 @@ impl BstNode {
         1 + std::cmp::max(left_height, right_height)
     }
 
-    fn print(&self, sb: &mut String, padding: &str, pointer: &str, has_right_sibling: bool) {
-        writeln!(sb).unwrap();
-        write!(sb, "{}", padding).unwrap();
-        write!(sb, "{}", pointer).unwrap();
-        write!(sb, "{}", self.value).unwrap();
-        let mut padding_builder = String::from(padding);
-        if has_right_sibling {
-            padding_builder.push_str("│  ");
-        } else {
-            padding_builder.push_str("   ");
+    fn print_node(&self, prefix: &str, is_left: bool) {
+        let side = if is_left { "└──" } else { "├──" };
+        println!("{}{} {}", prefix, side, self.value);
+    }
+
+    fn print_tree_helper(&self, prefix: &str, is_left: bool) {
+        if let Some(right) = self.right.as_ref() {
+            right.print_tree_helper(&format!("{}{}   ", prefix, if is_left { "│" } else { " " }), false);
         }
-        let padding_for_both = padding_builder.as_str();
-        let pointer_right = "└──";
-        let pointer_left = if self.right.is_some() { "├──" } else { "└──" };
-        if let Some(left) = &self.left {
-            left.print(sb, padding_for_both, pointer_left, self.right.is_some());
-        }
-        if let Some(right) = &self.right {
-            right.print(sb, padding_for_both, pointer_right, false);
+        self.print_node(prefix, is_left);
+        if let Some(left) = self.left.as_ref() {
+            left.print_tree_helper(&format!("{}{}   ", prefix, if is_left { " " } else { "│" }), true);
         }
     }
 
@@ -207,9 +199,7 @@ impl BinarySearchTree {
 
     pub fn print(&self) {
         if let Some(ref node) = self.root {
-            let mut sb = String::new();
-            node.print(&mut sb, "", "", false);
-            println!("{}", sb);
+            node.print_tree_helper("", false);
         }
     }
 
