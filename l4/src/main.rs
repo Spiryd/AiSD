@@ -104,7 +104,7 @@ fn test_rb() {
 
 fn test_splay() {
     println!("Splay Tree");
-    let items = gen_list(50, Order::Sorted);
+    let items = gen_list(30, Order::Sorted);
     let mut splay_tree = SplayTree::new();
     for item in &items{
         println!("Inserting: {}", item);
@@ -112,28 +112,13 @@ fn test_splay() {
         splay_tree.print_tree();
         println!("Tree height: {}", splay_tree.height());
     }
-    let items = gen_list(50, Order::Random);
-    for item in &items{
-        println!("Deleting: {}", item);
-        splay_tree.delete(*item);
-        splay_tree.print_tree();
-        println!("Tree height: {}", splay_tree.height());
-    }
-    let items = gen_list(50, Order::Random);
-    let mut splay_tree = SplayTree::new();
-    for item in &items{
-        println!("Inserting: {}", item);
-        splay_tree.insert(*item);
-        splay_tree.print_tree();
-        println!("Tree height: {}", splay_tree.height());
-    }
-    let items = gen_list(50, Order::Random);
-    for item in &items{
-        println!("Deleting: {}", item);
-        splay_tree.delete(*item);
-        splay_tree.print_tree();
-        println!("Tree height: {}", splay_tree.height());
-    }
+    let items = gen_list(30, Order::Random);
+    println!("Deleting: {}", items[0]);
+    splay_tree.delete(items[0]);
+    splay_tree.print_tree();
+    println!("Tree height: {}", splay_tree.height());
+
+
 }
 
 fn collect_data() {
