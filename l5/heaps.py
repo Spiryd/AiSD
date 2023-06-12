@@ -1,301 +1,307 @@
-class BinomialHeapNode:
-    def __init__(self, value):
-        self.value = value
-        self.degree = 0
-        self.parent = None
-        self.child = None
-        self.sibling = None
+import random
 
+import sys
+sys.setrecursionlimit(16000)
+
+import math
+def floor_log(x):
+    return math.frexp(x)[1] - 1
+
+cmps = 0
+
+class BinomialTree:
+    def __init__(self, key):
+        self.key = key
+        self.children = []
+        self.order = 0
+ 
+    def add_at_end(self, t):
+        self.children.append(t)
+        self.order = self.order + 1
+ 
+ 
 class BinomialHeap:
     def __init__(self):
-        self.head = None
-
-    def merge(self, heap):
-        # Metoda łącząca dwa kopce dwumianowe
-        self.head = self.merge_trees(self.head, heap.head)
-
-    def merge_trees(self, tree1, tree2):
-        # Metoda rekurencyjnie łącząca dwa drzewa kopca dwumianowego
-        if tree1 is None:
-            return tree2
-        elif tree2 is None:
-            return tree1
-        else:
-            if tree1.value <= tree2.value:
-                tree1.sibling = self.merge_trees(tree1.sibling, tree2)
-                tree1.sibling.parent = tree1
-                return tree1
-            else:
-                tree2.sibling = self.merge_trees(tree1, tree2.sibling)
-                tree2.sibling.parent = tree2
-                return tree2
-
-    def insert(self, value):
-        # Wstawianie elementu do kopca dwumianowego
-        new_heap = BinomialHeap()
-        new_heap.head = BinomialHeapNode(value)
-        self.merge(new_heap)
-
-    def get_min(self):
-        # Znajdowanie najmniejszego elementu w kopcu dwumianowym
-        if self.head is None:
-            return None
-
-        min_node = self.head
-        current_node = self.head.sibling
-        while current_node is not None:
-            if current_node.value < min_node.value:
-                min_node = current_node
-            current_node = current_node.sibling
-
-        return min_node.value
-
+        self.trees = []
+ 
     def extract_min(self):
-        # Usuwanie najmniejszego elementu z kopca dwumianowego
-        if self.head is None:
+        global cmps
+        if self.trees == []:
             return None
-
-        min_node = self.head
-        prev_node = None
-        current_node = self.head
-        next_node = current_node.sibling
-
-        while next_node is not None:
-            if next_node.value < min_node.value:
-                min_node = next_node
-                prev_node = current_node
-            current_node = next_node
-            next_node = next_node.sibling
-
-        if prev_node is None:
-            self.head = min_node.sibling
-        else:
-            prev_node.sibling = min_node.sibling
-
-        # Tworzenie nowego kopca z poddrzew usuwanego węzła
-        new_heap = BinomialHeap()
-        new_heap.head = min_node.child
-
-        # Odwrócenie kolejności rodzeństwa w poddrzewach
-        prev_node = None
-        current_node = new_heap.head
-        next_node = None
-        while current_node is not None:
-            next_node = current_node.sibling
-            current_node.sibling = prev_node
-            prev_node = current_node
-            current_node = next_node
-
-        # Łączenie kopca z odwróconym poddrzewem
-        new_heap.head = prev_node
-
-        # Łączenie nowego kopca z aktualnym kopcem
-        self.merge(new_heap)
-
-        return min_node.value
+        smallest_node = self.trees[0]
+        for tree in self.trees:
+            cmps += 1
+            if tree.key < smallest_node.key:
+                smallest_node = tree
+        self.trees.remove(smallest_node)
+        h = BinomialHeap()
+        h.trees = smallest_node.children
+        self.merge(h)
+ 
+        return smallest_node.key
+ 
+    def get_min(self):
+        global cmps
+        if self.trees == []:
+            return None
+        least = self.trees[0].key
+        for tree in self.trees:
+            cmps += 1
+            if tree.key < least:
+                least = tree.key
+        return least
+ 
+    def combine_roots(self, h):
+        self.trees.extend(h.trees)
+        self.trees.sort(key=lambda tree: tree.order)
+ 
+    def merge(self, h):
+        global cmps
+        self.combine_roots(h)
+        if self.trees == []:
+            return
+        i = 0
+        while i < len(self.trees) - 1:
+            current = self.trees[i]
+            after = self.trees[i + 1]
+            if current.order == after.order:
+                if (i + 1 < len(self.trees) - 1
+                    and self.trees[i + 2].order == after.order):
+                    after_after = self.trees[i + 2]
+                    cmps += 1
+                    if after.key < after_after.key:
+                        after.add_at_end(after_after)
+                        del self.trees[i + 2]
+                    else:
+                        after_after.add_at_end(after)
+                        del self.trees[i + 1]
+                else:
+                    cmps += 1
+                    if current.key < after.key:
+                        current.add_at_end(after)
+                        del self.trees[i + 1]
+                    else:
+                        after.add_at_end(current)
+                        del self.trees[i]
+            i = i + 1
+ 
+    def insert(self, key):
+        g = BinomialHeap()
+        g.trees.append(BinomialTree(key))
+        self.merge(g)
     
-class FibonacciHeapNode:
+# Creating fibonacci tree
+class FibonacciTree:
     def __init__(self, value):
         self.value = value
-        self.degree = 0
-        self.parent = None
-        self.child = None
-        self.marked = False
-        self.left = self
-        self.right = self
+        self.child = []
+        self.order = 0
+
+    # Adding tree at the end of the tree
+    def add_at_end(self, t):
+        self.child.append(t)
+        self.order = self.order + 1
+
 
 class FibonacciHeap:
     def __init__(self):
-        self.min_node = None
-        self.num_nodes = 0
+        self.trees = []
+        self.least = None
+        self.count = 0
 
+    # Insert a node
     def insert(self, value):
-        new_node = FibonacciHeapNode(value)
-        if self.min_node is None:
-            self.min_node = new_node
-        else:
-            self._insert_node(new_node, self.min_node)
-            if new_node.value < self.min_node.value:
-                self.min_node = new_node
-        self.num_nodes += 1
+        global cmps
+        new_tree = FibonacciTree(value)
+        self.trees.append(new_tree)
+        cmps += 1
+        if self.least is None or value < self.least.value:
+            self.least = new_tree
+        self.count += 1
 
-    def _insert_node(self, node, root):
-        node.left = root
-        node.right = root.right
-        root.right = node
-        node.right.left = node
-
+    # Get minimum value
     def get_min(self):
-        if self.min_node is None:
+        if self.least is None:
             return None
-        return self.min_node.value
+        return self.least.value
 
+    # Extract the minimum value
     def extract_min(self):
-        min_node = self.min_node
-        if min_node is not None:
-            if min_node.child is not None:
-                # Przyłączamy dzieci do korzenia kopca
-                child = min_node.child
-                while True:
-                    next_child = child.right
-                    self._insert_node(child, self.min_node)
-                    child.parent = None
-                    child = next_child
-                    if child == min_node.child:
-                        break
-
-            # Usuwamy min_node z korzeni kopca
-            min_node.left.right = min_node.right
-            min_node.right.left = min_node.left
-
-            if min_node == min_node.right:
-                self.min_node = None
+        smallest = self.least
+        if smallest is not None:
+            for child in smallest.child:
+                self.trees.append(child)
+            self.trees.remove(smallest)
+            if self.trees == []:
+                self.least = None
             else:
-                self.min_node = min_node.right
-                self._consolidate()
+                self.least = self.trees[0]
+                self.consolidate()
+            self.count -= 1
+            return smallest.value
 
-            self.num_nodes -= 1
+    # Consolidate the tree
+    def consolidate(self):
+        global cmps
+        aux = (floor_log(self.count) + 1) * [None]
 
-        return min_node.value
+        while self.trees != []:
+            x = self.trees[0]
+            order = x.order
+            self.trees.remove(x)
+            while aux[order] is not None:
+                y = aux[order]
+                cmps += 1
+                if x.value > y.value:
+                    x, y = y, x
+                x.add_at_end(y)
+                aux[order] = None
+                order += 1
+            aux[order] = x
 
-    def _consolidate(self):
-        max_degree = int((self.num_nodes ** 0.5) + 1)
-        degrees = [None] * max_degree
+        self.least = None
+        for k in aux:
+            if k is not None:
+                self.trees.append(k)
+                cmps += 1
+                if self.least is None or k.value < self.least.value:
+                    self.least = k
 
-        current_node = self.min_node
-        while True:
-            degree = current_node.degree
-            while degrees[degree] is not None:
-                other_node = degrees[degree]
-                if current_node.value > other_node.value:
-                    current_node, other_node = other_node, current_node
-                self._link_nodes(other_node, current_node)
-                degrees[degree] = None
-                degree += 1
-            degrees[degree] = current_node
-
-            current_node = current_node.right
-            if current_node == self.min_node:
-                break
-
-        self.min_node = None
-        for node in degrees:
-            if node is not None:
-                if self.min_node is None:
-                    self.min_node = node
-                else:
-                    self._insert_node(node, self.min_node)
-                    if node.value < self.min_node.value:
-                        self.min_node = node
-
-    def _link_nodes(self, child, parent):
-        child.left.right = child.right
-        child.right.left = child.left
-
-        child.parent = parent
-        if parent.child is None:
-            parent.child = child
-            child.right = child
-            child.left = child
-        else:
-            child.left = parent.child
-            child.right = parent.child.right
-            parent.child.right = child
-            child.right.left = child
-
-        parent.degree += 1
-        child.marked = False
-
-    def decrease_key(self, node, new_value):
-        if new_value > node.value:
-            return
-
-        node.value = new_value
-        parent = node.parent
-        if parent is not None and node.value < parent.value:
-            self._cut(node, parent)
-            self._cascading_cut(parent)
-        if node.value < self.min_node.value:
-            self.min_node = node
-
-    def _cut(self, child, parent):
-        child.left.right = child.right
-        child.right.left = child.left
-        parent.degree -= 1
-
-        if parent.child == child:
-            parent.child = child.right
-        if parent.degree == 0:
-            parent.child = None
-
-        child.left = self.min_node
-        child.right = self.min_node.right
-        self.min_node.right = child
-        child.right.left = child
-
-        child.parent = None
-        child.marked = False
-
-    def _cascading_cut(self, node):
-        parent = node.parent
-        if parent is not None:
-            if node.marked:
-                self._cut(node, parent)
-                self._cascading_cut(parent)
-            else:
-                node.marked = True
-
+    # Union two Fibonacci heaps
     def merge(self, other_heap):
-        # Metoda łącząca dwa kopce Fibonacciego
-        if other_heap.min_node is None:
-            return
+        global cmps
+        self.trees.extend(other_heap.trees)
+        cmps += 1
+        if self.least is None or (other_heap.least is not None and other_heap.least.value < self.least.value):
+            self.least = other_heap.least
+        self.count += other_heap.count
 
-        if self.min_node is None:
-            self.min_node = other_heap.min_node
-        else:
-            # Łączenie list korzeni
-            self._concatenate_lists(self.min_node, other_heap.min_node)
+def collect_data1():
+    global cmps
+    with open("./data/heap_data1.csv", "w") as file:
+        file.write("k;n;i;type;cmp\n")
+        for n in [500, 1000]:
+            for k in range(5):
+                i = 0
+                cmps = 0
+                heap1 = BinomialHeap()
+                file.write(f"{k};{n};{i};Bin;{cmps}\n")
+                cmps = 0
+                heap2 = BinomialHeap()
+                i += 1
+                file.write(f"{k};{n};{i};Bin;{cmps}\n")
+                for _ in range(n):
+                    cmps = 0
+                    heap1.insert(random.randint(0, (2*n - 1)))
+                    i += 1
+                    file.write(f"{k};{n};{i};Bin;{cmps}\n")
+                for _ in range(n):
+                    cmps = 0
+                    heap2.insert(random.randint(0, (2*n - 1)))
+                    i += 1
+                    file.write(f"{k};{n};{i};Bin;{cmps}\n")
+                cmps = 0
+                heap1.merge(heap2)
+                i += 1
+                file.write(f"{k};{n};{i};Bin;{cmps}\n")
+                for _ in range(2*n):
+                    cmps = 0
+                    heap1.extract_min()
+                    i += 1
+                    file.write(f"{k};{n};{i};Bin;{cmps}\n")
+                
+                i = 0
+                cmps = 0
+                heap1 = FibonacciHeap()
+                file.write(f"{k};{n};{i};Fib;{cmps}\n")
+                cmps = 0
+                heap2 = FibonacciHeap()
+                i += 1
+                file.write(f"{k};{n};{i};Fib;{cmps}\n")
+                for _ in range(n):
+                    cmps = 0
+                    heap1.insert(random.randint(0, (2*n - 1)))
+                    i += 1
+                    file.write(f"{k};{n};{i};Fib;{cmps}\n")
+                for _ in range(n):
+                    cmps = 0
+                    heap2.insert(random.randint(0, (2*n - 1)))
+                    i += 1
+                    file.write(f"{k};{n};{i};Fib;{cmps}\n")
+                cmps = 0
+                heap1.merge(heap2)
+                i += 1
+                file.write(f"{k};{n};{i};Fib;{cmps}\n")
+                for _ in range(2*n):
+                    cmps = 0
+                    heap1.extract_min()
+                    i += 1
+                    file.write(f"{k};{n};{i};Fib;{cmps}\n")    
 
-            # Aktualizacja min_node
-            if other_heap.min_node.value < self.min_node.value:
-                self.min_node = other_heap.min_node
+def collect_data2():
+    global cmps   
+    with open("./data/heap_data2.csv", "w") as file:
+        file.write("n;type;cmp\n")
+        for n in range(100, 10001, 100):
+            heap1 = BinomialHeap()
+            heap2 = BinomialHeap()
+            for _ in range(n):
+                heap1.insert(random.randint(0, (2*n - 1)))
+                heap2.insert(random.randint(0, (2*n - 1)))
+            heap1.merge(heap2)
+            for _ in range(2*n):
+                heap1.extract_min()
+            file.write(f"{n};Bin;{cmps}\n")
 
-        self.num_nodes += other_heap.num_nodes
+            cmps = 0
+            heap1 = FibonacciHeap()
+            heap2 = FibonacciHeap()
+            for _ in range(n):
+                heap1.insert(random.randint(0, (2*n - 1)))
+                heap2.insert(random.randint(0, (2*n - 1)))
+            heap1.merge(heap2)
+            for _ in range(2*n):
+                heap1.extract_min()
+            file.write(f"{n};Fib;{cmps}\n")
 
-    def _concatenate_lists(self, node1, node2):
-        # Metoda łącząca dwie listy węzłów
-        temp = node1.right
-        node1.right = node2.right
-        node2.right.left = node1
-        node2.right = temp
-        temp.left = node2
 
+if __name__ == "__main__":
+    collect_data1()
+    collect_data2()
+    heap1 = BinomialHeap()
+    heap1.insert(5)
+    heap1.insert(8)
 
+    heap2 = BinomialHeap()
+    heap2.insert(3)
+    heap2.insert(12)
 
-heap1 = BinomialHeap()
-heap1.insert(5)
-heap1.insert(7)
-heap1.insert(10)
+    heap1.merge(heap2)
 
-heap2 = BinomialHeap()
-heap2.insert(3)
-heap2.insert(8)
-heap2.insert(12)
+    min_value = heap1.extract_min()
+    print(min_value)  # Output: 3
+    min_value = heap1.extract_min()
+    print(min_value)  # Output: 5
+    min_value = heap1.extract_min()
+    print(min_value)  # Output: 8
+    min_value = heap1.extract_min()
+    print(min_value)  # Output: 12
 
-heap1.merge(heap2)
+    heap1 = FibonacciHeap()
+    heap1.insert(5)
+    heap1.insert(8)
 
-min_value = heap1.get_min()
-print(min_value)  # Output: 3
+    heap2 = FibonacciHeap()
+    heap2.insert(3)
+    heap2.insert(12)
 
-heap1 = FibonacciHeap()
-heap1.insert(5)
-heap1.insert(7)
+    heap1.merge(heap2)
 
-heap2 = FibonacciHeap()
-heap2.insert(3)
-heap2.insert(8)
-
-heap1.merge(heap2)
-
-min_value = heap1.get_min()
-print(min_value)  # Output: 3
+    min_value = heap1.extract_min()
+    print(min_value)  # Output: 3
+    min_value = heap1.extract_min()
+    print(min_value)  # Output: 5
+    min_value = heap1.extract_min()
+    print(min_value)  # Output: 8
+    min_value = heap1.extract_min()
+    print(min_value)  # Output: 12

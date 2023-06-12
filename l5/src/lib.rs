@@ -46,25 +46,34 @@ impl<T: Ord + PartialEq + Clone + Debug> Lcs<T>{
         self.c[self.a.len()][self.b.len()]
     }
 
-    pub fn print_diff(&self) {
-        let mut i = self.a.len() as isize;
-        let mut j = self.b.len() as isize;
+    pub fn print(&self) {
+        let i = self.a.len();
+        let j = self.b.len();
+        let mut stack: Vec<(usize, usize)> = Vec::new();
+        stack.push((i, j));
+        let mut res = Vec::new();
 
-        while i >= 0 && j >= 0 {
-            if i > 0 && j > 0 && self.a[i as usize - 1] == self.b[i as usize - 1] {
-                print!("  {:?}", self.a[i as usize - 1]);
-                i -= 1;
-                j -= 1;
-            } else if j > 0 && (i == 0 || self.c[i as usize][j as usize - 1] >= self.c[i as usize - 1][j as usize]) {
-                print!("+ {:?}", self.b[i as usize - 1]);
-                j -= 1;
-            } else if i > 0 && (j == 0 || self.c[i as usize][j as usize - 1] < self.c[i as usize - 1][j as usize]) {
-                print!("- {:?}", self.a[i as usize - 1]);
-                i -= 1;
+        while !stack.is_empty() {
+            let (x, y) = stack.pop().unwrap();
+
+            if x == 0 || y == 0 {
+                continue;
+            }
+            if self.a[x - 1] == self.b[y - 1] {
+                res.push(self.a[x - 1].clone());
+                stack.push((x-1, y-1));
+            } else if self.c[x][y-1] > self.c[x-1][y] {
+                stack.push((x, y-1));
             } else {
-                break;
+                stack.push((x-1, y));
             }
         }
+        res.reverse();
+        println!("{:?}", res)
+    }
+    
+    pub fn is_empty(&self) -> bool {
+        false
     }
 }
 
