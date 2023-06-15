@@ -28,8 +28,15 @@ fn main() {
 fn present() {
     let s1 = "XMJYAUZ".chars().collect();
     let s2 = "MZJAWXU".chars().collect();
-    println!("{:?}", s1);
-    println!("{:?}", s2);
+    println!("s1 = {:?}", s1);
+    println!("s2 = {:?}", s2);
+    let lcs =  Lcs::new(s1, s2);
+    println!("len = {}", lcs.len());
+    lcs.print();
+    let s1 = "ACADB".chars().collect();
+    let s2 = "CBDA".chars().collect();
+    println!("s1 = {:?}", s1);
+    println!("s2 = {:?}", s2);
     let lcs =  Lcs::new(s1, s2);
     println!("len = {}", lcs.len());
     lcs.print();

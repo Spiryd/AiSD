@@ -269,15 +269,23 @@ if __name__ == "__main__":
     collect_data1()
     collect_data2()
     heap1 = BinomialHeap()
+    print("BinomialHeap1 created")
     heap1.insert(5)
+    print("Inserted 5")
     heap1.insert(8)
+    print("Inserted 8")
 
     heap2 = BinomialHeap()
+    print("BinomialHeap2 created")
     heap2.insert(3)
+    print("Inserted 3")
     heap2.insert(12)
+    print("Inserted 12")
 
     heap1.merge(heap2)
+    print("Heaps Merged")
 
+    print("extracting mins...")
     min_value = heap1.extract_min()
     print(min_value)  # Output: 3
     min_value = heap1.extract_min()
@@ -288,15 +296,23 @@ if __name__ == "__main__":
     print(min_value)  # Output: 12
 
     heap1 = FibonacciHeap()
+    print("FibonacciHeap1 created")
     heap1.insert(5)
+    print("Inserted 5")
     heap1.insert(8)
+    print("Inserted 8")
 
     heap2 = FibonacciHeap()
+    print("FibonacciHeap2 created")
     heap2.insert(3)
+    print("Inserted 3")
     heap2.insert(12)
+    print("Inserted 12")
 
     heap1.merge(heap2)
+    print("Heaps Merged")
 
+    print("extracting mins...")
     min_value = heap1.extract_min()
     print(min_value)  # Output: 3
     min_value = heap1.extract_min()
