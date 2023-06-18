@@ -28,3 +28,8 @@ Algorithms and Data Structures
 * BinarySearchTree(BST)
 * Red-Black Tree
 * Splay's Tree
+
+## List5: Dyniamic
+
+*LCS problem dynamic programming
+*Binomial Heap vs Fibbonaci Heap
