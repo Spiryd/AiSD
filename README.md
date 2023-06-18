@@ -31,5 +31,5 @@ Algorithms and Data Structures
 
 ## List5: Dyniamic
 
-*LCS problem dynamic programming
-*Binomial Heap vs Fibbonaci Heap
+* LCS problem dynamic programming
+* Binomial Heap vs Fibbonaci Heap
