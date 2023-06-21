@@ -14,7 +14,7 @@ plt.savefig("./plots/lcs.png", dpi=1000)
 plt.clf()
 
 heap1 = pd.read_csv("./data/heap_data1.csv", sep=";")
-heap1 = heap1[(np.abs(stats.zscore(heap1["cmp"])) < 3)]
+#heap1 = heap1[(np.abs(stats.zscore(heap1["cmp"])) < 3)]
 n500 = heap1[heap1['n'] == 500]
 n1000 = heap1[heap1['n'] == 1000]
 print(heap1.head())
